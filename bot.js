@@ -1,7 +1,7 @@
 const telegraf = require('telegraf')
 const axios = require('axios')
 
-const api = '1627579170:AAHMTT5rVWzEXOY5lf1-RSlbmyaDFRQEqhA';
+const api = 'YOUR-BOT-API-TOKEN';
 
 const bot = new telegraf.Telegraf(api);
 
