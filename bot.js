@@ -61,7 +61,7 @@ bot.command('weather', (ctx) => {
     if(texto === '') {
         ctx.reply('Como no me des una ubicación, voy a buscarte y te pego un tiro. IMBECIL');
     } else {
-        let apiKey = 'YOUR-OPENWEATHERMAP-API-TOKEN';
+        let apiKey = '7b41c6df6d991f4c9990dbd7eed746eb';
         let city = texto;
         let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=es`
         axios
