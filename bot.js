@@ -6,7 +6,7 @@ const api = '1627579170:AAHMTT5rVWzEXOY5lf1-RSlbmyaDFRQEqhA';
 const bot = new telegraf.Telegraf(api);
 
 bot.catch((err) => {
-    console.log('ERROR: ', err);
+    console.log('ERROR: ', err.message);
 })
 
 bot.start((ctx) => {
