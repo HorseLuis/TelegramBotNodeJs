@@ -1,5 +1,6 @@
 const telegraf = require('telegraf')
 const axios = require('axios')
+const express = require('express')
 
 const api = '1627579170:AAHMTT5rVWzEXOY5lf1-RSlbmyaDFRQEqhA';
 
@@ -99,3 +100,10 @@ bot.on('left_chat_participant', ctx => {
 
 
 bot.launch();
+
+const app = express()
+app.get('/', (req,res) => res.send('Hello World!'))
+
+app.listen(process.env.PORT || 8080, () => {
+    console.log('Servidor desplegado correctamente')
+})
