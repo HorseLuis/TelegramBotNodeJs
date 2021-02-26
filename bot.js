@@ -2,7 +2,11 @@ const telegraf = require('telegraf')
 const axios = require('axios')
 // const express = require('express')
 
-const api = '1627579170:AAHMTT5rVWzEXOY5lf1-RSlbmyaDFRQEqhA';
+// const api = '1627579170:AAHMTT5rVWzEXOY5lf1-RSlbmyaDFRQEqhA';
+const api = process.env.API_KEY;
+const weather = process.env.WEATHER_KEY;
+console.log(api)
+console.log(weather);
 
 const bot = new telegraf.Telegraf(api);
 
@@ -61,9 +65,8 @@ bot.command('weather', (ctx) => {
     if(texto === '') {
         ctx.reply('Como no me des una ubicación, voy a buscarte y te pego un tiro. IMBECIL');
     } else {
-        let apiKey = '7b41c6df6d991f4c9990dbd7eed746eb';
         let city = texto;
-        let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=es`
+        let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${weather}&units=metric&lang=es`
         axios
             .get(url)
             .then(res => {
