@@ -97,4 +97,5 @@ bot.on('left_chat_participant', ctx => {
     ctx.reply(`Venga, ${user}, a tomar por culo.`);
 })
 
-bot.launch()
+
+bot.launch();
