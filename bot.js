@@ -57,6 +57,10 @@ bot.command('meme', (ctx) => {
                 var img = data.children[rand].data.url;
                 if (img.endsWith('jpg') || img.endsWith('png')){
                     ctx.replyWithPhoto({url: data.children[rand].data.url});
+                } else if (img.endsWith('gif')) {
+                    ctx.replyWithAnimation({url: data.children[rand].data.url});
+                } else if (img.endsWith('mp4')) {
+                    ctx.replyWithVideo({url: data.children[rand].data.url});
                 } else {
                     ctx.reply('Hoy no hay memes.');
                 }
