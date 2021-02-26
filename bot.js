@@ -1,19 +1,16 @@
 const telegraf = require('telegraf')
 const axios = require('axios')
-const express = require('express')
+const dotenv = require('dotenv')
 
-const app = express()
-app.post("/", (req,res) => {
-    const api = '1627579170:AAHMTT5rVWzEXOY5lf1-RSlbmyaDFRQEqhA';
-const weather = '7b41c6df6d991f4c9990dbd7eed746eb';
-// const api = process.env.API_KEY;
-// const weather = process.env.WEATHER_KEY;
-console.log(api)
-console.log(weather);
+dotenv.config();
 
-const bot = new telegraf.Telegraf(api);
+const api_key = process.env.API_KEY;
+const weather_key = process.env.WEATHER_KEY;
+
+const bot = new telegraf.Telegraf(api_key);
 
 bot.catch((err) => {
+    console.log('ERROR: ', err.message);
 })
 
 bot.start((ctx) => {
@@ -55,7 +52,12 @@ bot.command('meme', (ctx) => {
             var rand = Math.floor(Math.random() * 100);
 
             try {
-                ctx.replyWithPhoto({url: data.children[rand].data.url});
+                var img = data.children[rand].data.url;
+                if (img.endsWith('jpg') || img.endsWith('png')){
+                    ctx.replyWithPhoto({url: data.children[rand].data.url});
+                } else {
+                    ctx.reply('No hay meme. Te jodes.');
+                }
             } catch (error) {
                 ctx.reply('No hay meme. Te jodes.');
             }
@@ -69,11 +71,12 @@ bot.command('weather', (ctx) => {
         ctx.reply('Como no me des una ubicación, voy a buscarte y te pego un tiro. IMBECIL');
     } else {
         let city = texto;
-        let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${weather}&units=metric&lang=es`
+        let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${weather_key}&units=metric&lang=es`
         axios
             .get(url)
             .then(res => {
                 const data = res.data;
+                console.log(data);
                 const temp = data.main;
                 const weather = data.weather[0].description;
 
@@ -103,5 +106,3 @@ bot.on('left_chat_participant', ctx => {
 })
 
 bot.launch();
-})
-app.listen(process.env.PORT);
