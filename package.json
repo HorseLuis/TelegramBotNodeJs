@@ -5,11 +5,7 @@
   "main": "bot.js",
   "scripts": {
     "dev": "nodemon bot.js",
-<<<<<<< HEAD
     "start": "telegraf"
-=======
-    "start": "node bot.js"
->>>>>>> 142da3c07244c26db61902beb20594a984c12db8
   },
   "keywords": [
     "example",
