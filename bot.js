@@ -1,10 +1,13 @@
 const telegraf = require('telegraf')
 const axios = require('axios')
-// const express = require('express')
+const express = require('express')
 
-// const api = '1627579170:AAHMTT5rVWzEXOY5lf1-RSlbmyaDFRQEqhA';
-const api = process.env.API_KEY;
-const weather = process.env.WEATHER_KEY;
+const app = express()
+app.post("/", (req,res) => {
+    const api = '1627579170:AAHMTT5rVWzEXOY5lf1-RSlbmyaDFRQEqhA';
+const weather = '7b41c6df6d991f4c9990dbd7eed746eb';
+// const api = process.env.API_KEY;
+// const weather = process.env.WEATHER_KEY;
 console.log(api)
 console.log(weather);
 
@@ -100,9 +103,5 @@ bot.on('left_chat_participant', ctx => {
 })
 
 bot.launch();
-
-// const app = express()
-// app.post("/", (req,res) => {
-    
-// })
-// app.listen(process.env.PORT);
+})
+app.listen(process.env.PORT);
