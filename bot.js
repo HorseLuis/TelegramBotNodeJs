@@ -98,12 +98,7 @@ bot.on('left_chat_participant', ctx => {
     ctx.reply(`Venga, ${user}, a tomar por culo.`);
 })
 
-
-bot.launch();
-
 const app = express()
-app.get('/', (req,res) => res.send('Hello World!'))
-
 app.listen(process.env.PORT || 8080, () => {
-    console.log('Servidor desplegado correctamente')
+    bot.launch();
 })
