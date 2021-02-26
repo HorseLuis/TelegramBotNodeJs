@@ -1,13 +1,12 @@
 const telegraf = require('telegraf')
 const axios = require('axios')
-const express = require('express')
+// const express = require('express')
 
 const api = '1627579170:AAHMTT5rVWzEXOY5lf1-RSlbmyaDFRQEqhA';
 
 const bot = new telegraf.Telegraf(api);
 
 bot.catch((err) => {
-    console.log('ERROR: ', err.message);
 })
 
 bot.start((ctx) => {
@@ -69,7 +68,6 @@ bot.command('weather', (ctx) => {
             .get(url)
             .then(res => {
                 const data = res.data;
-                console.log(data);
                 const temp = data.main;
                 const weather = data.weather[0].description;
 
@@ -98,7 +96,10 @@ bot.on('left_chat_participant', ctx => {
     ctx.reply(`Venga, ${user}, a tomar por culo.`);
 })
 
-const app = express()
-app.listen(process.env.PORT || 8080, () => {
-    bot.launch();
-})
+bot.launch();
+
+// const app = express()
+// app.post("/", (req,res) => {
+    
+// })
+// app.listen(process.env.PORT);
