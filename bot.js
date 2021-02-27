@@ -8,7 +8,11 @@ dotenv.config();
 const api_key = process.env.API_KEY;
 const weather_key = process.env.WEATHER_KEY;
 
-const bot = new telegraf.Telegraf(api_key);
+var startBot;
+
+module.exports = {
+    startBot: function() {
+        const bot = new telegraf.Telegraf(api_key);
 
 bot.catch((err) => {
     console.log('ERROR: ', err.message);
@@ -98,7 +102,6 @@ bot.command('translate', (ctx) => {
             const text = values.split(',')[2];
 
             translator(text, lang_from, lang_to).then((res) => {
-                console.log(res);
                 ctx.reply(res);
             })
         } else {
@@ -131,6 +134,6 @@ bot.on('left_chat_participant', ctx => {
     ctx.reply(`Nos vemos, ${user}.`);
 })
 
-
-
 bot.launch();
+    }
+}
