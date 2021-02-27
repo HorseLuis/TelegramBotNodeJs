@@ -28,7 +28,7 @@ bot.command('help', (ctx) => {
     "/random valor1,valor2... - Devuelve un valor aleatorio de la lista proporcionada. Ejemplo: galletas,magdalenas,crepes\r\n" +
     "/meme - Te mando un meme de me_irl.\r\n" +
     "/weahter ubicación - El tiempo en la ubicación seleccionada. Ejemplo: Madrid\r\n" +
-    "/translate idioma1,idioma2,texto - Traduzo el texto que me envíes. Ejemplo: es,en,Me gustan las galletas\r\n" +
+    "/translate idioma1,idioma2,texto - Traduzo el texto que me envíes. Idiomas soportados: Español, Árabe, Chino, Francés, Alemán, Italiano, Portugués, Ruso. Ejemplo: es,en,Me gustan las galletas\r\n" +
     "\r\nEsto es todo. Tal vez tenga nuevas funciones en el futuro. Stay tuned.");
 })
 
@@ -135,5 +135,12 @@ bot.on('left_chat_participant', ctx => {
 })
 
 bot.launch();
+
+pingBot();
+
     }
+}
+
+function pingBot() {
+    var http = new XMLHttpRequest();
 }
