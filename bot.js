@@ -8,6 +8,10 @@ dotenv.config();
 const api_key = process.env.API_KEY;
 const weather_key = process.env.WEATHER_KEY;
 
+const regex1 = new RegExp(/.*bot.*/i);
+const regex2 = new RegExp(/.*Bot.*/i);
+const regex3 = new RegExp(/.*BOT.*/i);
+
 module.exports = {
     startBot: function() {
         const bot = new telegraf.Telegraf(api_key);
@@ -28,6 +32,7 @@ bot.command('help', (ctx) => {
     "/weahter ubicación - El tiempo en la ubicación seleccionada. Ejemplo: Madrid\r\n" +
     "/translate idioma1;idioma2;texto - Traduzo el texto que me envíes. Idiomas soportados: Español, Árabe, Chino, Francés, Alemán, Italiano, Portugués, Ruso. Ejemplo: es;en;Me gustan las galletas\r\n" +
     "/votekick - Se inicia una votación para expulsarte. Tras 1 minuto, se decidirá en base a los votos (disponible solo en grupos).\r\n" +
+    "/asminme - Se inicia una votación para promoverte a administrador. Tras 1 minuto, se decidirá en base a los votos (disponible solo en grupos).\r\n" +
     "\r\nEsto es todo. Tal vez tenga nuevas funciones en el futuro. Stay tuned.");
 })
 
@@ -124,48 +129,22 @@ bot.command('votekick', (ctx) => {
     const userName = ctx.from.username;
     
     if (ctx.chat.type === 'group') {
-        voteKick(userID, userName, ctx);
+        poll(userID, userName, ctx, 'kick');
     } else {
         ctx.reply('Este comando solo puede utilizarse en grupos.')
     }
 })
 
-let voteKick = async(userID, userName, ctx) => {
-    const chatID = ctx.chat.id;
-    const poll = await ctx.replyWithPoll(`¿Expulsar al usuario ${userName}?`,['SI','NO']);
-    const pollID = poll.message_id;
-
-    setTimeout(async() => {
-        const res = await stopPoll(chatID, pollID, ctx);
-        const usuarios = await ctx.getChatMembersCount();
-
-        const votos = res.total_voter_count;
-        const resOK = res.options[0].voter_count;
-        const resNOK = res.options[1].voter_count;
-
-        if(((usuarios-1)/2)<votos) {
-            if(resOK > resNOK) {
-                ctx.reply(`Se ha decidido por mayoría expulsar al usuario ${userName}`);
-                ctx.kickChatMember(userID);
-            } else {
-                ctx.reply(`Los usuarios del grupo han decidido no expulsar a ${userName}`);
-            }
-        } else {
-            ctx.reply('No han votado suficientes usuarios.');
-        }
-    }, 60000);
-}
-
-let stopPoll = async(chatID, pollID, ctx) => {
-    console.log(chatID);
-    console.log(pollID);
-    const res = ctx.stopPoll(pollID);
-    return res;
-}
-
-const regex1 = new RegExp(/.*bot.*/i);
-const regex2 = new RegExp(/.*Bot.*/i);
-const regex3 = new RegExp(/.*BOT.*/i);
+bot.command(['adminMe', 'adminme'], (ctx) => {
+    const userID = ctx.from.id;
+    const userName = ctx.from.username;
+    
+    if (ctx.chat.type === 'group') {
+        poll(userID, userName, ctx, 'admin');
+    } else {
+        ctx.reply('Este comando solo puede utilizarse en grupos.')
+    }
+})
 
 bot.hears([regex1,regex2,regex3], ctx => {
     if (!ctx.message.text.includes('@horse_luis_bot')){
@@ -186,4 +165,52 @@ bot.on('left_chat_participant', ctx => {
 bot.launch();
 
     }
+}
+
+let poll = async(userID, userName, ctx, type) => {
+    const chatID = ctx.chat.id;
+    var text = '';
+    if (type == 'kick') {
+        text = `¿Expulsar al usuario ${userName}?`;
+    } else if (type == 'admin') {
+        text = `Ascender al usuario ${userName} a administrador?`;
+    }
+    const poll = await ctx.replyWithPoll(text,['SI','NO']);
+    const pollID = poll.message_id;
+
+    setTimeout(async() => {
+        const res = await stopPoll(chatID, pollID, ctx);
+        const usuarios = await ctx.getChatMembersCount();
+
+        const votos = res.total_voter_count;
+        const resOK = res.options[0].voter_count;
+        const resNOK = res.options[1].voter_count;
+
+        if(((usuarios-1)/2)<votos) {
+            if(resOK > resNOK) {
+                if (type == 'kick') {
+                    ctx.reply(`Se ha decidido por mayoría expulsar al usuario ${userName}`);
+                    ctx.kickChatMember(userID);
+                } else if (type == 'admin') {
+                    ctx.reply(`Se ha decidido por mayoría ascender al usuario ${userName} a administrador`);
+                    ctx.promoteChatMember(userID);
+                }
+            } else {
+                if (type == 'kick') {
+                    ctx.reply(`Los usuarios del grupo han decidido no expulsar a ${userName}`);
+                } else if (type == 'admin') {
+                    ctx.reply(`Los usuarios del grupo han decidido no expulsar a ${userName}`);
+                }
+            }
+        } else {
+            ctx.reply('No han votado suficientes usuarios.');
+        }
+    }, 60000);
+}
+
+let stopPoll = async(chatID, pollID, ctx) => {
+    console.log(chatID);
+    console.log(pollID);
+    const res = ctx.stopPoll(pollID);
+    return res;
 }
