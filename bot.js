@@ -32,7 +32,7 @@ bot.command('help', (ctx) => {
     "/weahter ubicación - El tiempo en la ubicación seleccionada. Ejemplo: Madrid\r\n" +
     "/translate idioma1;idioma2;texto - Traduzo el texto que me envíes. Idiomas soportados: Español, Árabe, Chino, Francés, Alemán, Italiano, Portugués, Ruso. Ejemplo: es;en;Me gustan las galletas\r\n" +
     "/votekick - Se inicia una votación para expulsarte. Tras 1 minuto, se decidirá en base a los votos (disponible solo en grupos).\r\n" +
-    "/asminme - Se inicia una votación para promoverte a administrador. Tras 1 minuto, se decidirá en base a los votos (disponible solo en grupos).\r\n" +
+    "/adminme - Se inicia una votación para promoverte a administrador. Tras 1 minuto, se decidirá en base a los votos (disponible solo en grupos).\r\n" +
     "\r\nEsto es todo. Tal vez tenga nuevas funciones en el futuro. Stay tuned.");
 })
 
