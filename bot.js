@@ -136,11 +136,5 @@ bot.on('left_chat_participant', ctx => {
 
 bot.launch();
 
-pingBot();
-
     }
-}
-
-function pingBot() {
-    var http = new XMLHttpRequest();
 }
