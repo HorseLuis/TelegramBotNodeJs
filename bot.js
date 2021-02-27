@@ -29,6 +29,7 @@ bot.command('help', (ctx) => {
     "/meme - Te mando un meme de me_irl.\r\n" +
     "/weahter ubicación - El tiempo en la ubicación seleccionada. Ejemplo: Madrid\r\n" +
     "/translate idioma1,idioma2,texto - Traduzo el texto que me envíes. Idiomas soportados: Español, Árabe, Chino, Francés, Alemán, Italiano, Portugués, Ruso. Ejemplo: es,en,Me gustan las galletas\r\n" +
+    "/votekick - Se inicia una votación para expulsarte. Tras 1 minuto, se decidirá en base a los votos (disponible solo en grupos).\r\n" +
     "\r\nEsto es todo. Tal vez tenga nuevas funciones en el futuro. Stay tuned.");
 })
 
@@ -108,6 +109,50 @@ bot.command('translate', (ctx) => {
             ctx.reply('Asegúrate de introducir todos los datos correctamente.');
         }
 })
+
+bot.command('votekick', (ctx) => {
+    const userID = ctx.from.id;
+    const userName = ctx.from.username;
+    
+    if (ctx.chat.type === 'group') {
+        voteKick(userID, userName, ctx);
+    } else {
+        ctx.reply('Este comando solo puede utilizarse en grupos.')
+    }
+})
+
+let voteKick = async(userID, userName, ctx) => {
+    const chatID = ctx.chat.id;
+    const poll = await ctx.replyWithPoll(`¿Expulsar al usuario ${userName}?`,['SI','NO']);
+    const pollID = poll.message_id;
+
+    setTimeout(async() => {
+        const res = await stopPoll(chatID, pollID, ctx);
+        const usuarios = await ctx.getChatMembersCount();
+
+        const votos = res.total_voter_count;
+        const resOK = res.options[0].voter_count;
+        const resNOK = res.options[1].voter_count;
+
+        if(((usuarios-1)/2)<votos) {
+            if(resOK > resNOK) {
+                ctx.reply(`Se ha decidido por mayoría expulsar al usuario ${userName}`);
+                ctx.kickChatMember(userID);
+            } else {
+                ctx.reply(`Los usuarios del grupo han decidido no expulsar a ${userName}`);
+            }
+        } else {
+            ctx.reply('No han votado suficientes usuarios.');
+        }
+    }, 60000);
+}
+
+let stopPoll = async(chatID, pollID, ctx) => {
+    console.log(chatID);
+    console.log(pollID);
+    const res = ctx.stopPoll(pollID);
+    return res;
+}
 
 let translator = async(text, from, to) => {
     const res = await translate(text, {from: `${from}`, to: `${to}`, engine: 'libre'});
