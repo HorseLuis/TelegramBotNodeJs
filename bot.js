@@ -52,19 +52,15 @@ module.exports = {
         })
         
         bot.command('post', (ctx) => {
-            var ok = false;
-            var i = 1;
             var sub = '';
             var texto = ctx.message.text;
-            texto = texto.replace('/meme', '').trim();
+            texto = texto.replace('/post', '').trim();
             if(texto != '') {
                 sub = texto;
             } else {
                 sub = 'me_irl'
             }
-
-            while(ok = false && i < 5) {
-                axios
+            axios
                 .get(`https://www.reddit.com/r/${sub}/new.json?limit=100`)
                 .then(res => {
                     const data = res.data.data;
@@ -77,16 +73,10 @@ module.exports = {
                     try {
                         var img = data.children[rand].data.url;
                         if (img.endsWith('jpg') || img.endsWith('png') || img.endsWith('.jpeg')){
-                            ok = true;
-                            i = 5;
                             ctx.replyWithPhoto({url: data.children[rand].data.url});
                         } else if (img.endsWith('gif')) {
-                            ok = true;
-                            i = 5;
                             ctx.replyWithAnimation({url: data.children[rand].data.url});
                         } else if (img.endsWith('mp4')) {
-                            ok = true;
-                            i = 5;
                             ctx.replyWithVideo({url: data.children[rand].data.url});
                         } else {
                             ctx.reply('Hoy no hay memes.');
@@ -94,30 +84,7 @@ module.exports = {
                     } catch (error) {
                         ctx.reply('Hoy no hay memes.');
                     }
-
-                    i += 1;
                 })
-            }
-            
-        })
-        
-        bot.command('weather', (ctx) => {
-            var texto = ctx.message.text.replace('/weather', '').trim();
-            if(texto === '') {
-                ctx.reply('Necesito una ubicación para poder proporcionarte datos del clima.');
-            } else {
-                let city = texto;
-                let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${weather_key}&units=metric&lang=es`
-                axios
-                    .get(url)
-                    .then(res => {
-                        const data = res.data;
-                        const temp = data.main;
-                        const weather = data.weather[0].description;
-        
-                        ctx.reply(`Estado del Cielo: ${weather}\r\nTemperatura Actual: ${temp.temp}°\r\nMínima Hoy: ${temp.temp_min}°\r\nMáxima Hoy: ${temp.temp_max}°\r\nHumedad: ${temp.humidity}%`);
-                    })
-            }
         })
         
         bot.command('translate', (ctx) => {
