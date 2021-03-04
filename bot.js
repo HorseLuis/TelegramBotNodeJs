@@ -29,7 +29,7 @@ module.exports = {
             ctx.reply("Soy como una navaja suiza, sirvo para muchas cosas. ¿No me crees? Echa un vistazo a mis increibles funcionalidades:\r\n\r\n" +
             "/help - Puedes pedirme ayuda si quieres.\r\n" +
             "/random valor1,valor2... - Devuelve un valor aleatorio de la lista proporcionada. Ejemplo: galletas,magdalenas,crepes\r\n" +
-            "/meme subreddit - Te mando un post del subreddit que elijas. Si no escribes ninguno, será de me_irl por defecto\r\n" +
+            "/post subreddit - Te mando una imagen del subreddit que elijas. Si no escribes ninguno, será de me_irl por defecto\r\n" +
             "/weahter ubicación - El tiempo en la ubicación seleccionada. Ejemplo: Madrid\r\n" +
             "/translate idioma1;idioma2;texto - Traduzo el texto que me envíes. Idiomas soportados: Español, Árabe, Chino, Francés, Alemán, Italiano, Portugués, Ruso. Ejemplo: es;en;Me gustan las galletas\r\n" +
             "/votekick - Se inicia una votación para expulsarte. Tras 1 minuto, se decidirá en base a los votos (disponible solo en grupos).\r\n" +
@@ -51,7 +51,9 @@ module.exports = {
             
         })
         
-        bot.command('meme', (ctx) => {
+        bot.command('post', (ctx) => {
+            var ok = false;
+            var i = 1;
             var sub = '';
             var texto = ctx.message.text;
             texto = texto.replace('/meme', '').trim();
@@ -60,7 +62,9 @@ module.exports = {
             } else {
                 sub = 'me_irl'
             }
-            axios
+
+            while(ok = false && i < 5) {
+                axios
                 .get(`https://www.reddit.com/r/${sub}/new.json?limit=100`)
                 .then(res => {
                     const data = res.data.data;
@@ -73,10 +77,16 @@ module.exports = {
                     try {
                         var img = data.children[rand].data.url;
                         if (img.endsWith('jpg') || img.endsWith('png') || img.endsWith('.jpeg')){
+                            ok = true;
+                            i = 5;
                             ctx.replyWithPhoto({url: data.children[rand].data.url});
                         } else if (img.endsWith('gif')) {
+                            ok = true;
+                            i = 5;
                             ctx.replyWithAnimation({url: data.children[rand].data.url});
                         } else if (img.endsWith('mp4')) {
+                            ok = true;
+                            i = 5;
                             ctx.replyWithVideo({url: data.children[rand].data.url});
                         } else {
                             ctx.reply('Hoy no hay memes.');
@@ -84,7 +94,11 @@ module.exports = {
                     } catch (error) {
                         ctx.reply('Hoy no hay memes.');
                     }
+
+                    i += 1;
                 })
+            }
+            
         })
         
         bot.command('weather', (ctx) => {
