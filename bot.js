@@ -29,7 +29,7 @@ module.exports = {
             ctx.reply("Soy como una navaja suiza, sirvo para muchas cosas. ¿No me crees? Echa un vistazo a mis increibles funcionalidades:\r\n\r\n" +
             "/help - Puedes pedirme ayuda si quieres.\r\n" +
             "/random valor1,valor2... - Devuelve un valor aleatorio de la lista proporcionada. Ejemplo: galletas,magdalenas,crepes\r\n" +
-            "/meme - Te mando un meme de me_irl.\r\n" +
+            "/meme subreddit - Te mando un post del subreddit que elijas. Si no escribes ninguno, será de me_irl por defecto\r\n" +
             "/weahter ubicación - El tiempo en la ubicación seleccionada. Ejemplo: Madrid\r\n" +
             "/translate idioma1;idioma2;texto - Traduzo el texto que me envíes. Idiomas soportados: Español, Árabe, Chino, Francés, Alemán, Italiano, Portugués, Ruso. Ejemplo: es;en;Me gustan las galletas\r\n" +
             "/votekick - Se inicia una votación para expulsarte. Tras 1 minuto, se decidirá en base a los votos (disponible solo en grupos).\r\n" +
@@ -52,8 +52,16 @@ module.exports = {
         })
         
         bot.command('meme', (ctx) => {
+            var sub = '';
+            var texto = ctx.message.text;
+            texto = texto.replace('/meme', '').trim();
+            if(texto != '') {
+                sub = texto;
+            } else {
+                sub = 'me_irl'
+            }
             axios
-                .get('https://www.reddit.com/r/me_irl/new.json?limit=100')
+                .get(`https://www.reddit.com/r/${sub}/new.json?limit=100`)
                 .then(res => {
                     const data = res.data.data;
                     if (data.children.length < 1) {
@@ -64,7 +72,7 @@ module.exports = {
         
                     try {
                         var img = data.children[rand].data.url;
-                        if (img.endsWith('jpg') || img.endsWith('png')){
+                        if (img.endsWith('jpg') || img.endsWith('png') || img.endsWith('.jpeg')){
                             ctx.replyWithPhoto({url: data.children[rand].data.url});
                         } else if (img.endsWith('gif')) {
                             ctx.replyWithAnimation({url: data.children[rand].data.url});
