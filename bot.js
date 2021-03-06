@@ -29,8 +29,9 @@ module.exports = {
             ctx.reply("Soy como una navaja suiza, sirvo para muchas cosas. ¿No me crees? Echa un vistazo a mis increibles funcionalidades:\r\n\r\n" +
             "/help - Puedes pedirme ayuda si quieres.\r\n" +
             "/random valor1,valor2... - Devuelve un valor aleatorio de la lista proporcionada. Ejemplo: galletas,magdalenas,crepes\r\n" +
-            "/post subreddit - Te mando una imagen del subreddit que elijas. Si no escribes ninguno, será de me_irl por defecto\r\n" +
-            "/weahter ubicación - El tiempo en la ubicación seleccionada. Ejemplo: Madrid\r\n" +
+            "/meme - Te envío un meme de me_irl\r\n" +
+            "/post subreddit - Te mando un post del subreddit que elijas\r\n" +
+            "/weather ubicación - El tiempo en la ubicación seleccionada. Ejemplo: Madrid\r\n" +
             "/translate idioma1;idioma2;texto - Traduzo el texto que me envíes. Idiomas soportados: Español, Árabe, Chino, Francés, Alemán, Italiano, Portugués, Ruso. Ejemplo: es;en;Me gustan las galletas\r\n" +
             "/votekick - Se inicia una votación para expulsarte. Tras 1 minuto, se decidirá en base a los votos (disponible solo en grupos).\r\n" +
             "/adminme - Se inicia una votación para promoverte a administrador. Tras 1 minuto, se decidirá en base a los votos (disponible solo en grupos).\r\n" +
@@ -50,29 +51,21 @@ module.exports = {
              }
             
         })
-        
-        bot.command('post', (ctx) => {
-            var sub = '';
-            var texto = ctx.message.text;
-            texto = texto.replace('/post', '').trim();
-            if(texto != '') {
-                sub = texto;
-            } else {
-                sub = 'me_irl'
-            }
+
+        bot.command('meme', (ctx) => {
             axios
-                .get(`https://www.reddit.com/r/${sub}/new.json?limit=100`)
-                .then(res => {
-                    const data = res.data.data;
-                    if (data.children.length < 1) {
-                        ctx.reply('Hoy no hay memes.');
-                    }
-        
-                    var rand = Math.floor(Math.random() * 100);
-        
+            .get(`https://www.reddit.com/r/me_irl/new.json?limit=100`)
+            .then(res => {
+                const data = res.data.data;
+                if (data.children.length < 1) {
+                    ctx.reply('Hoy no hay memes.');
+                } else {
+                    var rand = Math.floor(Math.random() * data.children.length);
+    
                     try {
+                        console.log(data.children[rand].data);
                         var img = data.children[rand].data.url;
-                        if (img.endsWith('jpg') || img.endsWith('png') || img.endsWith('.jpeg')){
+                        if (img.endsWith('jpg') || img.endsWith('png') || img.endsWith('jpeg')){
                             ctx.replyWithPhoto({url: data.children[rand].data.url});
                         } else if (img.endsWith('gif')) {
                             ctx.replyWithAnimation({url: data.children[rand].data.url});
@@ -84,7 +77,50 @@ module.exports = {
                     } catch (error) {
                         ctx.reply('Hoy no hay memes.');
                     }
+                }
+            })
+        })
+        
+        bot.command('post', (ctx) => {
+            var sub = '';
+            var texto = ctx.message.text;
+            texto = texto.replace('/post', '').trim();
+            if(texto != '') {
+                sub = texto;
+
+                axios
+                .get(`https://www.reddit.com/r/${sub}/new.json?limit=100`)
+                .then(res => {
+                    const data = res.data.data;
+                    if (data.children.length < 1) {
+                        ctx.reply('No hay datos que mostrar. Asegúrate de escribir correctamente el nombre del subreddit.');
+                    } else {
+                        var rand = Math.floor(Math.random() * data.children.length);
+                        ctx.reply(data.children[rand].data.url);
+                    }
                 })
+            } else {
+                ctx.reply('Debes indicar un subreddit.')
+            }
+        })
+
+        bot.command('weather', (ctx) => {
+            var texto = ctx.message.text.replace('/weather', '').trim();
+            if(texto === '') {
+                ctx.reply('Necesito una ubicación para poder proporcionarte datos del clima.');
+            } else {
+                let city = texto;
+                let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${weather_key}&units=metric&lang=es`
+                axios
+                    .get(url)
+                    .then(res => {
+                        const data = res.data;
+                        const temp = data.main;
+                        const weather = data.weather[0].description;
+        
+                        ctx.reply(`Estado del cielo: ${weather}\r\nTemperatura actual: ${Math.round(temp.temp)}°\r\nMínima hoy: ${Math.floor(temp.temp_min)}°\r\nMáxima hoy: ${Math.ceil(temp.temp_max)}°\r\nHumedad: ${temp.humidity}%`);
+                    })
+            }
         })
         
         bot.command('translate', (ctx) => {
