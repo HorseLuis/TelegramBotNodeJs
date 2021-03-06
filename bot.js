@@ -8,6 +8,7 @@ dotenv.config();
 
 const api_key = process.env.API_KEY;
 const weather_key = process.env.WEATHER_KEY;
+const gif_key = process.env.GIF_KEY;
 
 const regex1 = new RegExp(/.*bot.*/i);
 const regex2 = new RegExp(/.*Bot.*/i);
@@ -31,6 +32,7 @@ module.exports = {
             "/random valor1,valor2... - Devuelve un valor aleatorio de la lista proporcionada. Ejemplo: galletas,magdalenas,crepes\r\n" +
             "/meme - Te envío un meme de me_irl\r\n" +
             "/post subreddit - Te mando un post del subreddit que elijas\r\n" +
+            "/gif búsqueda - Te envío un gif sobre lo que me digas, si existe\r\n" +
             "/weather ubicación - El tiempo en la ubicación seleccionada. Ejemplo: Madrid\r\n" +
             "/translate idioma1;idioma2;texto - Traduzo el texto que me envíes. Idiomas soportados: Español, Árabe, Chino, Francés, Alemán, Italiano, Portugués, Ruso. Ejemplo: es;en;Me gustan las galletas\r\n" +
             "/votekick - Se inicia una votación para expulsarte. Tras 1 minuto, se decidirá en base a los votos (disponible solo en grupos).\r\n" +
@@ -100,8 +102,33 @@ module.exports = {
                     }
                 })
             } else {
-                ctx.reply('Debes indicar un subreddit.')
+                ctx.reply('Debes indicar un subreddit.');
             }
+        })
+
+        bot.command('gif', (ctx) => {
+            var texto = ctx.message.text;
+            texto = texto.replace('/gif', '').trim();
+            if(texto != '') {
+                axios
+            .get(`https://g.tenor.com/v1/random?key=${gif_key}&q=${texto}&media_filter=minimal&contentfilter=off&limit=5&locale=es_ES&ar_range=all`)
+            .then(res => {
+                const data = res.data.results;
+                if (data.length < 1) {
+                    ctx.reply('No hay datos que mostrar. Asegúrate de escribir algo que tenga sentido.');
+                } else {
+                    var rand = Math.floor(Math.random() * data.length);
+                    try {
+                        ctx.replyWithAnimation({url: data[rand].media[0].gif.url});
+                    } catch (error) {
+                        ctx.reply('No hay datos que mostrar. Asegúrate de escribir algo que tenga sentido.');
+                    }
+                }
+            })
+            } else {
+                ctx.reply('Dime qué debo buscar, por favor.');
+            }
+            
         })
 
         bot.command('weather', (ctx) => {
